@@ -7,8 +7,11 @@ const app = express();
 // Middleware
 app.use(morgan('dev'));
 
-app.get("/", async (req, res) => {
-    res.send("hello, friend!");
+// Routes
+
+// Landing Page
+app.get("/", (req, res, next) => {
+    res.render("index.ejs");
 });
 
 app.listen(3000, () => {
