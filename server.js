@@ -4,18 +4,43 @@ const express = require('express');
 const morgan = require('morgan');
 
 // Database
-require('./config/database')
+require('./config/database');
+
+const Fruit = require("./models/fruit.js");
 
 const app = express();
 
 // Middleware
 app.use(morgan('dev'));
 
+app.use(express.urlencoded({ extended: false }));
+
 // Routes
 
 // Landing Page
 app.get("/", (req, res, next) => {
     res.render("index.ejs");
+});
+
+// Fruits
+app.get('/fruits/new', (req, res, next) => {
+  res.render('fruits/new.ejs');
+});
+
+app.post("/fruits", async (req, res, next) => {
+  // Converting data from checkbox ('on' or 'off') to Boolean
+  if (req.body.isReadyToEat === "on") {
+    req.body.isReadyToEat = true;
+  } else {
+    req.body.isReadyToEat = false;
+  };
+  await Fruit.create(req.body);
+  res.redirect("/fruits");
+});
+
+app.get('/fruits', async (req, res, next) => {
+  const fruits = await Fruit.find();
+  res.render('fruits/index.ejs', {fruits});
 });
 
 app.listen(3000, () => {
