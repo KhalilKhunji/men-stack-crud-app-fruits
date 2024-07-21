@@ -1,6 +1,10 @@
 // Import modules
+require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
+
+// Database
+require('./config/database')
 
 const app = express();
 
