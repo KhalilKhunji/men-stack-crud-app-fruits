@@ -11,6 +11,9 @@ const Fruit = require("./models/fruit.js");
 
 const app = express();
 
+// Controllers
+const fruitsCtrl = require('./controllers/fruits');
+
 // Middleware
 app.use(morgan('dev'));
 
@@ -21,57 +24,22 @@ app.use(methodOverride('_method'));
 // Routes
 
 // Landing Page
-app.get("/", (req, res, next) => {
-    res.render("index.ejs");
-});
+app.get('/', fruitsCtrl.landing);
 
 // Fruits
-app.get('/fruits/new', (req, res, next) => {
-  res.render('fruits/new.ejs');
-});
+app.get('/fruits/new', fruitsCtrl.fruitNew);
 
-app.post("/fruits", async (req, res, next) => {
-  // Converting data from checkbox ('on' or 'off') to Boolean
-  if (req.body.isReadyToEat === "on") {
-    req.body.isReadyToEat = true;
-  } else {
-    req.body.isReadyToEat = false;
-  };
-  await Fruit.create(req.body);
-  res.redirect("/fruits");
-});
+app.post('/fruits', fruitsCtrl.fruitsPost);
 
-app.get('/fruits', async (req, res, next) => {
-  const fruits = await Fruit.find();
-  res.render('fruits/index.ejs', {fruits});
-});
+app.get('/fruits', fruitsCtrl.fruitsGet);
 
-app.get("/fruits/:fruitId", async (req, res, next) => {
-  const foundFruit = await Fruit.findById(req.params.fruitId);
-  res.render("fruits/show.ejs", { fruit: foundFruit });
-});
+app.get('/fruits/:fruitId', fruitsCtrl.fruitIdGet);
 
-app.delete("/fruits/:fruitId", async (req, res, next) => {
-  await Fruit.findByIdAndDelete(req.params.fruitId);
-  res.redirect("/fruits");
-});
+app.delete('/fruits/:fruitId', fruitsCtrl.fruitDelete);
 
-app.get("/fruits/:fruitId/edit", async (req, res) => {
-  const foundFruit = await Fruit.findById(req.params.fruitId);
-  res.render("fruits/edit.ejs", {
-    fruit: foundFruit,
-  });
-});
+app.get('/fruits/:fruitId/edit', fruitsCtrl.fruitEdit);
 
-app.put("/fruits/:fruitId", async (req, res) => {
-  if (req.body.isReadyToEat === "on") {
-    req.body.isReadyToEat = true;
-  } else {
-    req.body.isReadyToEat = false;
-  };
-  await Fruit.findByIdAndUpdate(req.params.fruitId, req.body);
-  res.redirect(`/fruits/${req.params.fruitId}`);
-});
+app.put('/fruits/:fruitId', fruitsCtrl.fruitUpdate);
 
 app.listen(3000, () => {
   console.log('Listening on port 3000');
